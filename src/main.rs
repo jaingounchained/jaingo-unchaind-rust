@@ -1,3 +1,14 @@
+#![allow(unused)]
+
+mod bitboard;
+mod fen_parser;
+mod moves;
+mod pieces;
+mod position;
+
 fn main() {
-    println!("Hello, world!");
+    let position: position::Position =
+        fen_parser::parse_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    println!("{}", position)
 }
