@@ -26,81 +26,62 @@ fn parse_piece_placement(piece_placement_str: &str) -> PiecePlacement {
     let mut white_pieces: HashMap<PieceType, Bitboard> = HashMap::new();
     let mut black_pieces: HashMap<PieceType, Bitboard> = HashMap::new();
 
+    for piece in PieceType::iterator() {
+        white_pieces.insert(*piece, 0);
+        black_pieces.insert(*piece, 0);
+    }
+
     for i in 0..8 {
         let mut k = 0;
         for c in ranks[i].chars() {
             let index = 8 * (7 - i) + k;
             match c {
                 'P' => {
-                    white_pieces
-                        .entry(PieceType::Pawn)
-                        .and_modify(|v| *v += 1 << index);
+                    *white_pieces.entry(PieceType::PAWN).or_default() += 1 << index;
                     k += 1;
                 }
                 'N' => {
-                    white_pieces
-                        .entry(PieceType::Knight)
-                        .and_modify(|v| *v += 1 << index);
+                    *white_pieces.entry(PieceType::KNIGHT).or_default() += 1 << index;
                     k += 1;
                 }
                 'B' => {
-                    white_pieces
-                        .entry(PieceType::Bishop)
-                        .and_modify(|v| *v += 1 << index);
+                    *white_pieces.entry(PieceType::BISHOP).or_default() += 1 << index;
                     k += 1;
                 }
                 'R' => {
-                    white_pieces
-                        .entry(PieceType::Rook)
-                        .and_modify(|v| *v += 1 << index);
+                    *white_pieces.entry(PieceType::ROOK).or_default() += 1 << index;
                     k += 1;
                 }
                 'Q' => {
-                    white_pieces
-                        .entry(PieceType::Queen)
-                        .and_modify(|v| *v += 1 << index);
+                    *white_pieces.entry(PieceType::QUEEN).or_default() += 1 << index;
                     k += 1;
                 }
                 'K' => {
-                    white_pieces
-                        .entry(PieceType::King)
-                        .and_modify(|v| *v += 1 << index);
+                    *white_pieces.entry(PieceType::KING).or_default() += 1 << index;
                     k += 1;
                 }
                 'p' => {
-                    black_pieces
-                        .entry(PieceType::Pawn)
-                        .and_modify(|v| *v += 1 << index);
+                    *black_pieces.entry(PieceType::PAWN).or_default() += 1 << index;
                     k += 1;
                 }
                 'n' => {
-                    black_pieces
-                        .entry(PieceType::Knight)
-                        .and_modify(|v| *v += 1 << index);
+                    *black_pieces.entry(PieceType::KNIGHT).or_default() += 1 << index;
                     k += 1;
                 }
                 'b' => {
-                    black_pieces
-                        .entry(PieceType::Bishop)
-                        .and_modify(|v| *v += 1 << index);
+                    *black_pieces.entry(PieceType::BISHOP).or_default() += 1 << index;
                     k += 1;
                 }
                 'r' => {
-                    black_pieces
-                        .entry(PieceType::Rook)
-                        .and_modify(|v| *v += 1 << index);
+                    *black_pieces.entry(PieceType::ROOK).or_default() += 1 << index;
                     k += 1;
                 }
                 'q' => {
-                    black_pieces
-                        .entry(PieceType::Queen)
-                        .and_modify(|v| *v += 1 << index);
+                    *black_pieces.entry(PieceType::QUEEN).or_default() += 1 << index;
                     k += 1;
                 }
                 'k' => {
-                    black_pieces
-                        .entry(PieceType::King)
-                        .and_modify(|v| *v += 1 << index);
+                    *black_pieces.entry(PieceType::KING).or_default() += 1 << index;
                     k += 1;
                 }
                 _ => {
@@ -112,17 +93,17 @@ fn parse_piece_placement(piece_placement_str: &str) -> PiecePlacement {
     }
 
     let mut piece_placement = HashMap::new();
-    piece_placement.insert(Color::White, PieceBitboard(white_pieces));
-    piece_placement.insert(Color::Black, PieceBitboard(black_pieces));
+    piece_placement.insert(Color::WHITE, PieceBitboard(white_pieces));
+    piece_placement.insert(Color::BLACK, PieceBitboard(black_pieces));
 
     return PiecePlacement(piece_placement);
 }
 
 fn parse_active_color(active_color_str: &str) -> Color {
     if active_color_str == "w" {
-        return Color::White;
+        return Color::WHITE;
     }
-    return Color::Black;
+    return Color::BLACK;
 }
 
 fn parse_castling_rights(castling_rights_str: &str) -> CastlingRights {
@@ -143,14 +124,14 @@ fn parse_castling_rights(castling_rights_str: &str) -> CastlingRights {
 
     let mut castling_rights = HashMap::new();
     castling_rights.insert(
-        Color::White,
+        Color::WHITE,
         CastlingTypes(
             white_king_side_castling_type,
             white_queen_side_castling_type,
         ),
     );
     castling_rights.insert(
-        Color::Black,
+        Color::BLACK,
         CastlingTypes(
             black_king_side_castling_type,
             black_queen_side_castling_type,

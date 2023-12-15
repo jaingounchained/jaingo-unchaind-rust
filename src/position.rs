@@ -3,6 +3,9 @@ use crate::moves::Square;
 use core::fmt;
 use std::collections::HashMap;
 use std::fmt::write;
+use std::slice::Iter;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 #[derive(Debug)]
 pub struct Position {
@@ -18,7 +21,7 @@ impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "\n{}\nActive {}\n\nCastling rights:\n{}\n\nHalf move clock: {}\n\nFull move number: {}\n",
+            "\n{}\nActive color: {}\n\nCastling rights:\n{}\n\nHalf move clock: {}\n\nFull move number: {}\n",
             self.piece_placement,
             self.active_color,
             self.castling_rights,
@@ -28,24 +31,29 @@ impl fmt::Display for Position {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, EnumIter)]
 pub enum Color {
-    White,
-    Black,
+    WHITE,
+    BLACK,
 }
 
 impl Color {
     fn string(&self) -> &str {
         match self {
-            Color::White => "White",
-            Color::Black => "Black",
+            Color::WHITE => "White",
+            Color::BLACK => "Black",
         }
+    }
+
+    pub fn iterator() -> Iter<'static, Color> {
+        static COLORS: [Color; 2] = [Color::WHITE, Color::BLACK];
+        COLORS.iter()
     }
 }
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Color: {}", self.string())
+        write!(f, "{}", self.string())
     }
 }
 
@@ -67,8 +75,8 @@ impl fmt::Display for CastlingRights {
         write!(
             f,
             "White: \n{}\nBlack: \n{}",
-            self.0.get(&Color::White).unwrap(),
-            self.0.get(&Color::Black).unwrap(),
+            self.0.get(&Color::WHITE).unwrap(),
+            self.0.get(&Color::BLACK).unwrap(),
         )
     }
 }
