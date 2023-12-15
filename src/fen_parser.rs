@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, os::unix::fs::MetadataExt};
 
 use crate::{
-    bitboard::{PieceBitboard, PiecePlacement},
+    bitboard::{Bitboard, PieceBitboard, PiecePlacement},
     moves::Square,
-    pieces::PieceType,
+    piece::PieceType,
     position::{CastlingRights, CastlingTypes, Color, Position},
 };
 
@@ -23,8 +23,8 @@ pub fn parse_fen(fen: &str) -> Position {
 fn parse_piece_placement(piece_placement_str: &str) -> PiecePlacement {
     let ranks: Vec<&str> = piece_placement_str.split("/").collect();
 
-    let mut white_pieces: PieceBitboard = HashMap::new();
-    let mut black_pieces: PieceBitboard = HashMap::new();
+    let mut white_pieces: HashMap<PieceType, Bitboard> = HashMap::new();
+    let mut black_pieces: HashMap<PieceType, Bitboard> = HashMap::new();
 
     for i in 0..8 {
         let mut k = 0;
@@ -112,10 +112,10 @@ fn parse_piece_placement(piece_placement_str: &str) -> PiecePlacement {
     }
 
     let mut piece_placement = HashMap::new();
-    piece_placement.insert(Color::White, white_pieces);
-    piece_placement.insert(Color::Black, black_pieces);
+    piece_placement.insert(Color::White, PieceBitboard(white_pieces));
+    piece_placement.insert(Color::Black, PieceBitboard(black_pieces));
 
-    return piece_placement;
+    return PiecePlacement(piece_placement);
 }
 
 fn parse_active_color(active_color_str: &str) -> Color {
@@ -126,24 +126,38 @@ fn parse_active_color(active_color_str: &str) -> Color {
 }
 
 fn parse_castling_rights(castling_rights_str: &str) -> CastlingRights {
-    let mut black_castling_type = (false, false);
-    let mut white_castling_type = (false, false);
+    let mut white_king_side_castling_type = false;
+    let mut white_queen_side_castling_type = false;
+    let mut black_king_side_castling_type = false;
+    let mut black_queen_side_castling_type = false;
 
     for c in castling_rights_str.chars() {
         match c {
-            'K' => white_castling_type.0 = true,
-            'Q' => white_castling_type.1 = true,
-            'k' => black_castling_type.0 = true,
-            'q' => black_castling_type.1 = true,
+            'K' => white_king_side_castling_type = true,
+            'Q' => white_queen_side_castling_type = true,
+            'k' => black_king_side_castling_type = true,
+            'q' => black_queen_side_castling_type = true,
             _ => {}
         }
     }
 
     let mut castling_rights = HashMap::new();
-    castling_rights.insert(Color::White, white_castling_type);
-    castling_rights.insert(Color::Black, black_castling_type);
+    castling_rights.insert(
+        Color::White,
+        CastlingTypes(
+            white_king_side_castling_type,
+            white_queen_side_castling_type,
+        ),
+    );
+    castling_rights.insert(
+        Color::Black,
+        CastlingTypes(
+            black_king_side_castling_type,
+            black_queen_side_castling_type,
+        ),
+    );
 
-    return castling_rights;
+    return CastlingRights(castling_rights);
 }
 
 fn parse_en_passant_target(en_passant_target: &str) -> u8 {

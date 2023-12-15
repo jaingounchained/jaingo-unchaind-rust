@@ -3,7 +3,7 @@
 mod bitboard;
 mod fen_parser;
 mod moves;
-mod pieces;
+mod piece;
 mod position;
 
 fn main() {
