@@ -11,42 +11,66 @@ use strum_macros::EnumIter;
 pub struct Position {
     pub piece_placement: PiecePlacement,
     pub active_color: Color,
-    pub castling_rights: CastlingRights,
-    pub en_passant_target: u8,
+    pub castling_rights: Option<CastlingRights>,
+    pub en_passant_target: Option<Square>,
     pub half_move_clock: u16,
     pub full_move_number: u16,
 }
 
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "\n{}\nActive color: {}\n\nCastling rights:\n{}\n\nHalf move clock: {}\n\nFull move number: {}\n",
-            self.piece_placement,
-            self.active_color,
-            self.castling_rights,
-            self.half_move_clock,
-            self.full_move_number,
-        )
+        let mut position_representation: String =
+            format!("Piece placement:\n {}\n", self.piece_placement);
+        position_representation = format!(
+            "{}Active color: {}\n",
+            position_representation, self.active_color
+        );
+        match &self.castling_rights {
+            Some(castling_rights) => {
+                position_representation = format!(
+                    "{}Castling rights:\n{}\n",
+                    position_representation, castling_rights
+                )
+            }
+            None => {}
+        }
+        match &self.en_passant_target {
+            Some(en_passant_target) => {
+                position_representation = format!(
+                    "{}En passant target: {}\n",
+                    position_representation, en_passant_target
+                )
+            }
+            None => {}
+        }
+        position_representation = format!(
+            "{}Half move clock: {}\n",
+            position_representation, self.half_move_clock
+        );
+        position_representation = format!(
+            "{}Full move number: {}\n",
+            position_representation, self.full_move_number
+        );
+        f.write_str(&position_representation)
     }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, EnumIter)]
 pub enum Color {
-    WHITE,
-    BLACK,
+    White,
+    Black,
 }
 
 impl Color {
     fn string(&self) -> &str {
         match self {
-            Color::WHITE => "White",
-            Color::BLACK => "Black",
+            Color::White => "White",
+            Color::Black => "Black",
         }
     }
 
     pub fn iterator() -> Iter<'static, Color> {
-        static COLORS: [Color; 2] = [Color::WHITE, Color::BLACK];
+        static COLORS: [Color; 2] = [Color::White, Color::Black];
         COLORS.iter()
     }
 }
@@ -57,8 +81,8 @@ impl fmt::Display for Color {
     }
 }
 
-// king side and queen side castling
 #[derive(Debug)]
+// king side and queen side castling
 pub struct CastlingTypes(pub bool, pub bool);
 
 impl fmt::Display for CastlingTypes {
@@ -75,8 +99,8 @@ impl fmt::Display for CastlingRights {
         write!(
             f,
             "White: \n{}\nBlack: \n{}",
-            self.0.get(&Color::WHITE).unwrap(),
-            self.0.get(&Color::BLACK).unwrap(),
+            self.0.get(&Color::White).unwrap(),
+            self.0.get(&Color::Black).unwrap(),
         )
     }
 }

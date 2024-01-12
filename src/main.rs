@@ -2,13 +2,17 @@
 
 mod bitboard;
 mod fen_parser;
+mod move_generator;
 mod moves;
 mod piece;
 mod position;
+mod utils;
 
 fn main() {
-    let position: position::Position =
-        fen_parser::parse_fen("4k2r/6r1/8/8/8/8/3R4/R3K3 w Qk - 0 1");
+    match fen_parser::parse_fen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e4 0 1") {
+        Ok(position) => println!("{}", position),
+        Err(err) => println!("{}", err),
+    }
 
-    println!("{}", position)
+    println!("{}", bitboard::bitboard_representation(0x8040201008040200));
 }
